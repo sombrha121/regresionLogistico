@@ -1,0 +1,423 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regresión Logística Simple</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1, h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #e6f7ff;
+        }
+        .formula {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .result-box {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #2ecc71;
+        }
+        .prediction {
+            display: inline-block;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 20px;
+            background-color: #e8f8f5;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .prediction.reprobado {
+            background-color: #fae8e8;
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <h1>Regresión Logística Simple</h1>
+    
+    <h2>Datos Originales</h2>
+    <table>
+        <tr>
+            <th>Paciente</th>
+            <th>Horas de Paciente (x)</th>
+            <th>Aprobó (y)</th>
+        </tr>
+        
+        <tr>
+            <td>P1</td>
+            <td>9</td>
+            <td>0</td>
+        </tr>
+        
+        <tr>
+            <td>P2</td>
+            <td>6</td>
+            <td>0</td>
+        </tr>
+        
+        <tr>
+            <td>P3</td>
+            <td>8</td>
+            <td>0</td>
+        </tr>
+        
+        <tr>
+            <td>P4</td>
+            <td>6</td>
+            <td>0</td>
+        </tr>
+        
+        <tr>
+            <td>P5</td>
+            <td>5</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>P6</td>
+            <td>7</td>
+            <td>0</td>
+        </tr>
+        
+        <tr>
+            <td>P7</td>
+            <td>6</td>
+            <td>0</td>
+        </tr>
+        
+        <tr>
+            <td>P8</td>
+            <td>7</td>
+            <td>0</td>
+        </tr>
+        
+        <tr>
+            <td>P9</td>
+            <td>5</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>P10</td>
+            <td>5</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>P11</td>
+            <td>4</td>
+            <td>1</td>
+        </tr>
+        
+        <tr>
+            <td>P12</td>
+            <td>5</td>
+            <td>1</td>
+        </tr>
+        
+    </table>
+    
+    <h2>Paso 1: Ajuste de valores de y</h2>
+    <div class="result-box">
+        <p>Para evitar valores extremos al aplicar el logaritmo:</p>
+        <p><strong>0 → 0.01</strong> y <strong>1 → 0.99</strong></p>
+    </div>
+    
+    <h2>Paso 2: Cálculo de logit(y)</h2>
+    <div class="formula">
+        logit(y) = ln(y / (1 - y))
+    </div>
+    <table>
+        <tr>
+            <th>Paciente</th>
+            <th>y (ajustado)</th>
+            <th>logit(y)</th>
+        </tr>
+        
+        <tr>
+            <td>P1</td>
+            <td>0.01</td>
+            <td>-4.595</td>
+        </tr>
+        
+        <tr>
+            <td>P2</td>
+            <td>0.01</td>
+            <td>-4.595</td>
+        </tr>
+        
+        <tr>
+            <td>P3</td>
+            <td>0.01</td>
+            <td>-4.595</td>
+        </tr>
+        
+        <tr>
+            <td>P4</td>
+            <td>0.01</td>
+            <td>-4.595</td>
+        </tr>
+        
+        <tr>
+            <td>P5</td>
+            <td>0.99</td>
+            <td>4.595</td>
+        </tr>
+        
+        <tr>
+            <td>P6</td>
+            <td>0.01</td>
+            <td>-4.595</td>
+        </tr>
+        
+        <tr>
+            <td>P7</td>
+            <td>0.01</td>
+            <td>-4.595</td>
+        </tr>
+        
+        <tr>
+            <td>P8</td>
+            <td>0.01</td>
+            <td>-4.595</td>
+        </tr>
+        
+        <tr>
+            <td>P9</td>
+            <td>0.99</td>
+            <td>4.595</td>
+        </tr>
+        
+        <tr>
+            <td>P10</td>
+            <td>0.99</td>
+            <td>4.595</td>
+        </tr>
+        
+        <tr>
+            <td>P11</td>
+            <td>0.99</td>
+            <td>4.595</td>
+        </tr>
+        
+        <tr>
+            <td>P12</td>
+            <td>0.99</td>
+            <td>4.595</td>
+        </tr>
+        
+    </table>
+    
+    <h2>Paso 3: Tabla de operaciones</h2>
+    <table>
+        <tr>
+            <th>x</th>
+            <th>y (ajustado)</th>
+            <th>logit(y)</th>
+            <th>x·logit(y)</th>
+            <th>x²</th>
+        </tr>
+        
+        <tr>
+            <td>9</td>
+            <td>0.01</td>
+            <td>-4.595</td>
+            <td>-41.356</td>
+            <td>81</td>
+        </tr>
+        
+        <tr>
+            <td>6</td>
+            <td>0.01</td>
+            <td>-4.595</td>
+            <td>-27.571</td>
+            <td>36</td>
+        </tr>
+        
+        <tr>
+            <td>8</td>
+            <td>0.01</td>
+            <td>-4.595</td>
+            <td>-36.761</td>
+            <td>64</td>
+        </tr>
+        
+        <tr>
+            <td>6</td>
+            <td>0.01</td>
+            <td>-4.595</td>
+            <td>-27.571</td>
+            <td>36</td>
+        </tr>
+        
+        <tr>
+            <td>5</td>
+            <td>0.99</td>
+            <td>4.595</td>
+            <td>22.976</td>
+            <td>25</td>
+        </tr>
+        
+        <tr>
+            <td>7</td>
+            <td>0.01</td>
+            <td>-4.595</td>
+            <td>-32.166</td>
+            <td>49</td>
+        </tr>
+        
+        <tr>
+            <td>6</td>
+            <td>0.01</td>
+            <td>-4.595</td>
+            <td>-27.571</td>
+            <td>36</td>
+        </tr>
+        
+        <tr>
+            <td>7</td>
+            <td>0.01</td>
+            <td>-4.595</td>
+            <td>-32.166</td>
+            <td>49</td>
+        </tr>
+        
+        <tr>
+            <td>5</td>
+            <td>0.99</td>
+            <td>4.595</td>
+            <td>22.976</td>
+            <td>25</td>
+        </tr>
+        
+        <tr>
+            <td>5</td>
+            <td>0.99</td>
+            <td>4.595</td>
+            <td>22.976</td>
+            <td>25</td>
+        </tr>
+        
+        <tr>
+            <td>4</td>
+            <td>0.99</td>
+            <td>4.595</td>
+            <td>18.38</td>
+            <td>16</td>
+        </tr>
+        
+        <tr>
+            <td>5</td>
+            <td>0.99</td>
+            <td>4.595</td>
+            <td>22.976</td>
+            <td>25</td>
+        </tr>
+        
+        <tr style="font-weight: bold; background-color: #e6f7ff;">
+            <td>∑ = 73</td>
+            <td></td>
+            <td>∑ = -9.19</td>
+            <td>∑ = -114.88</td>
+            <td>∑ = 467</td>
+        </tr>
+    </table>
+    
+    <h2>Paso 4: Cálculo de la pendiente (b₁)</h2>
+    <div class="formula">
+        b₁ = [n·∑(x·logit(y)) - ∑x·∑logit(y)] / [n·∑x² - (∑x)²]<br>
+        b₁ = [12·-114.88 - 73·-9.19] / [12·467 - 73²]<br>
+        b₁ = -2.57
+    </div>
+    
+    <h2>Paso 5: Cálculo del intercepto (b₀)</h2>
+    <div class="formula">
+        b₀ = [∑logit(y) - b₁·∑x] / n<br>
+        b₀ = [-9.19 - -2.57·73] / 12<br>
+        b₀ = 14.89
+    </div>
+    
+    <h2>Paso 6: Ecuación Logística Final</h2>
+    <div class="result-box">
+        <div class="formula">
+            logit(p) = 14.89 + -2.57·x<br><br>
+            p(x) = 1 / (1 + e<sup>-(14.89 + -2.57·x)</sup>)
+        </div>
+    </div>
+    
+    <h2>Predicciones</h2>
+    <div style="margin-bottom: 20px;">
+        
+        <div class="prediction ">
+            x = 1: p(x) = 1.0 → Aprobado
+        </div>
+        
+        <div class="prediction ">
+            x = 2: p(x) = 0.9999 → Aprobado
+        </div>
+        
+        <div class="prediction ">
+            x = 3: p(x) = 0.9992 → Aprobado
+        </div>
+        
+        <div class="prediction ">
+            x = 4: p(x) = 0.99 → Aprobado
+        </div>
+        
+        <div class="prediction ">
+            x = 5: p(x) = 0.8831 → Aprobado
+        </div>
+        
+        <div class="prediction reprobado">
+            x = 6: p(x) = 0.3655 → Reprobado
+        </div>
+        
+        <div class="prediction reprobado">
+            x = 7: p(x) = 0.0421 → Reprobado
+        </div>
+        
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px; color: #7f8c8d; font-size: 0.9em;">
+        Reporte generado automáticamente con Python
+    </div>
+</body>
+</html>
